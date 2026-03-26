@@ -1,0 +1,63 @@
+# ============================================================
+# Your Profile Configuration
+# ============================================================
+# Fill this out with your information. Tools and agents
+# reference this file for personalization.
+
+profile:
+  name: "Your Name"
+  business: "Your Business Name"
+  website: "https://www.yourbusiness.com"
+  email: "you@yourbusiness.com"
+  phone: ""
+  youtube_handle: "@YourChannel"
+  booking_link: ""
+  industry: ""  # e.g., "real estate", "fitness", "consulting", "SaaS"
+  credential_line: ""  # e.g., "10 years helping small businesses grow online"
+  team_description: ""  # e.g., "solo", "team of 3", "husband-wife team"
+
+# YouTube channels to track (your own + competitors + strategy)
+channels:
+  own:
+    - handle: "@YourChannel"
+      name: "Your Channel Name"
+      db_name: "youtube_my_channel"
+
+  competitors:
+    # - handle: "@CompetitorOne"
+    #   name: "Competitor One"
+    #   db_name: "youtube_competitor_one"
+    # - handle: "@CompetitorTwo"
+    #   name: "Competitor Two"
+    #   db_name: "youtube_competitor_two"
+
+  strategy:
+    - handle: "@ChannelJunkies"
+      name: "Channel Junkies"
+      db_name: "youtube_channel_junkies"
+
+# Database paths (defaults work for most setups)
+paths:
+  knowledge_bases: "./knowledge_bases/vectors"
+  transcripts: "./knowledge_bases/transcripts"
+  manifest: "~/.knowledge_base_ai/manifest.json"
+
+# Content preferences
+content:
+  # Your markets / areas of focus
+  markets:
+    - "Your City"
+
+  # Topics you frequently cover
+  topics:
+    - "topic 1"
+    - "topic 2"
+    - "topic 3"
+
+  # Words/phrases that are part of your voice
+  voice_markers:
+    - ""  # e.g., "here's the thing", "let me be real"
+
+  # Things to never say (brand constraints)
+  never_say:
+    - ""  # e.g., industry jargon you avoid

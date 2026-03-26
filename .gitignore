@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+mcp_server/dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Config with secrets
+config/.env
+.knowledge_base_ai/
+
+# Knowledge base data (large binary files)
+knowledge_bases/vectors/*/
+knowledge_bases/transcripts/
+!knowledge_bases/vectors/.gitkeep
+!knowledge_bases/vectors/youtube_channel_junkies/
+!knowledge_bases/documents/.gitkeep
+!knowledge_bases/books/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+*.egg-info/
