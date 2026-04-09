@@ -1,9 +1,8 @@
 {
   "name": "realtor-blog-cms",
-  "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A lightweight blog CMS with AI-powered content pipeline. Research topics, review content, and publish blog posts with Claude Code.",
+  "description": "A lightweight CMS for reviewing and publishing AI-generated blog posts. Built with React 19, Vite, Tailwind CSS 4, and Supabase.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,6 +11,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.102.1",
     "@tailwindcss/vite": "^4.2.2",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

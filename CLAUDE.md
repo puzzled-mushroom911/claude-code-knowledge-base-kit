@@ -1,11 +1,12 @@
-# Blog CMS -- Claude Code Instructions
+# Blog CMS — Claude Code Instructions
 
 ## Overview
 
 This is a lightweight CMS for managing AI-generated blog posts. Built with React 19, Vite, Tailwind CSS 4, and Supabase.
 
-- **Dev server:** `npm run dev`
-- **Supabase project:** Uses the Supabase instance configured in `.env`
+- **Directory:** `~/realtor-blog-cms/` (rename to match your project)
+- **Supabase project:** Uses the same Supabase instance as the main website
+- **Dev server:** `cd ~/realtor-blog-cms && npm run dev`
 
 ## "CMS" as Context Keyword
 
@@ -13,7 +14,7 @@ When the user references **"CMS"** in conversation, it means this blog CMS and i
 
 ## Tables
 
-### `blog_posts` -- Published blog content
+### `blog_posts` — Published blog content
 
 | Column | Type | Notes |
 |--------|------|-------|
@@ -32,10 +33,11 @@ When the user references **"CMS"** in conversation, it means this blog CMS and i
 | keywords | text | SEO keywords |
 | content | JSONB | Array of content blocks (paragraph, heading, list, callout, quote, image, table, stat-cards, pros-cons, info-box, process-steps) |
 | status | text | draft, needs-review, published |
+| editor_notes | JSONB | Array of {blockIndex, text, author, createdAt, resolved} — inline comments on content blocks |
 | created_at | timestamptz | Auto-set |
 | updated_at | timestamptz | Auto-set |
 
-### `blog_topics` -- Topic research pipeline
+### `blog_topics` — Topic research pipeline
 
 | Column | Type | Notes |
 |--------|------|-------|
@@ -56,7 +58,7 @@ When the user references **"CMS"** in conversation, it means this blog CMS and i
 
 ## Topic Pipeline Workflows
 
-### Saving researched topics -- "put topics in the CMS"
+### Saving researched topics → "put topics in the CMS"
 
 When the user asks you to save researched topics to the CMS:
 
@@ -65,7 +67,7 @@ When the user asks you to save researched topics to the CMS:
 3. Build `research_data` JSONB following the structure below
 4. Set status to `'researched'`
 
-### Writing approved topics -- "write the approved topics from the CMS"
+### Writing approved topics → "write the approved topics from the CMS"
 
 When the user asks you to write approved topics:
 
@@ -75,7 +77,7 @@ When the user asks you to write approved topics:
 4. INSERT the blog post into `blog_posts` with status `'draft'`
 5. UPDATE the topic: set `status = 'written'` and `blog_post_id = <new post id>`
 
-### Checking for changes -- "I made changes in the CMS"
+### Checking for changes → "I made changes in the CMS"
 
 When the user says they made changes in the CMS:
 
@@ -111,8 +113,8 @@ Always save research data in this format for consistency:
     "featured_snippets": true
   },
   "suggested_angles": [
-    "Angle 1 -- why it works for our audience",
-    "Angle 2 -- differentiation opportunity"
+    "Angle 1 — why it works for our audience",
+    "Angle 2 — differentiation opportunity"
   ],
   "full_brief": "Complete markdown SEO brief including all of the above in readable format"
 }
@@ -134,3 +136,15 @@ When writing blog posts, use these JSONB block types:
 - `{ "type": "table", "headers": ["..."], "rows": [["...", "..."]] }`
 - `{ "type": "stat-cards", "items": [{ "label": "...", "value": "..." }] }`
 - `{ "type": "pros-cons", "pros": ["..."], "cons": ["..."] }`
+
+## Prompt Block Type
+
+The `prompt` block type is a special instruction block for Claude. It appears in the editor with a violet dashed border and is NOT rendered on the public site. Use it to leave instructions within the content for Claude to process.
+
+- `{ "type": "prompt", "text": "Generate a comparison table of flood insurance costs by zone..." }`
+
+## Revalidation
+
+When `VITE_REVALIDATE_URL` is set in `.env`, the CMS will POST to that URL after saving a published post. This triggers ISR cache refresh on the public site so changes appear immediately.
+
+For Next.js sites, set this to: `https://yourdomain.com/admin/api/revalidate`
