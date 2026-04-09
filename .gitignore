@@ -1,32 +1,25 @@
 # Dependencies
 node_modules/
-mcp_server/dist/
-__pycache__/
-*.pyc
-.venv/
-venv/
 
-# Config with secrets
-config/.env
-.knowledge_base_ai/
+# Build output
+dist/
 
-# Knowledge base data (large binary files)
-knowledge_bases/vectors/*/
-knowledge_bases/transcripts/
-!knowledge_bases/vectors/.gitkeep
-!knowledge_bases/vectors/youtube_channel_junkies/
-!knowledge_bases/documents/.gitkeep
-!knowledge_bases/books/
+# Environment variables (never commit these)
+.env
+.env.local
+.env.*.local
 
-# IDE
+# Editor directories and files
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Build artifacts
-dist/
-*.egg-info/
+# Logs
+*.log
+npm-debug.log*

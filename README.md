@@ -1,323 +1,310 @@
-# Claude Code Knowledge Base Kit
+# Realtor Blog CMS
 
-Build a local, searchable knowledge base from your YouTube channel, books, PDFs, and documents -- then use it with Claude Code to generate content, answer questions, and run your business smarter. Works for any industry.
+A lightweight content management system for reviewing and publishing AI-generated blog posts. Built for content creators who use Claude Code (or any AI) to research topics, generate SEO-optimized blog posts, and manage their publishing pipeline -- all backed by Supabase.
 
-Everything runs on your computer. No data leaves your machine.
+**Stack:** React 19 + Vite + Tailwind CSS 4 + Supabase (all free tier)
 
----
+## Features
 
-## What This Does
+- **Blog post management** -- Draft, review, and publish posts with a clean editor interface
+- **Topic research pipeline** -- Research keywords and topics with Claude Code, save them to the CMS, review and approve, then write
+- **AI-native workflow** -- CLAUDE.md teaches Claude Code your database schema, content block format, and pipeline commands
+- **Inline editing** -- Click any text block in the preview to make quick corrections
+- **SEO metadata** -- Title, meta description, keywords, and slug editing with character counts
+- **Deploy hooks** -- Automatically trigger a site rebuild when you publish a post
+- **Scheduling** -- Set a future publish date and posts show as "Scheduled"
+- **Settings page** -- Configure your brand name, site URL, default author, and more (saved to localStorage)
+- **Row Level Security** -- Authenticated users manage everything; public API only returns published posts
 
-1. **Ingests your YouTube channel** -- downloads transcripts, chunks them, and stores searchable embeddings locally
-2. **Indexes books and documents** -- PDFs, Word docs, markdown, and text files become a queryable knowledge base
-3. **Lets Claude Code search it all** -- ask questions in plain English across all your knowledge bases
-4. **Powers content generation** -- Claude uses your knowledge base to write in your voice with your expertise
-5. **Tracks competitors** -- ingest competitor YouTube channels to find content gaps and opportunities
+## Prerequisites
 
-### Use Cases
-
-| Use Case | How It Works |
-|---|---|
-| "What have I said about [topic]?" | Semantic search across your video transcripts |
-| Content planning | Analyze competitor coverage, find gaps, plan differentiation |
-| Blog posts from videos | Turn any video transcript into an SEO blog post in your voice |
-| Email sequences | Generate nurture emails grounded in your actual expertise |
-| Customer responses | Draft replies using your knowledge base for accurate, on-brand answers |
-| Lead magnets | Turn your video content into guides, reports, or downloadable resources |
-| Strategy research | Query marketing books (Hormozi, Brunson) for frameworks and tactics |
-
----
+- **Node.js 18+** -- [Download here](https://nodejs.org/)
+- **Supabase account** -- [Sign up here](https://supabase.com/) (free tier is plenty)
+- **Claude Code** (optional but recommended) -- [Get it here](https://claude.ai/download)
+- **Vercel account** (for deployment) -- [Sign up here](https://vercel.com/) (free tier works)
 
 ## Quick Start
 
-### Step 1: Prerequisites
+### 1. Use this template
+
+Click **"Use this template"** on GitHub, or fork the repo:
 
 ```bash
-brew install python@3.12 node yt-dlp ffmpeg
+git clone https://github.com/YOUR_USERNAME/claude-code-knowledge-base-kit.git
+cd claude-code-knowledge-base-kit
+npm install
 ```
 
-- **Python 3.10+** -- powers the data processing
-- **Node.js** -- connects Claude Code to your tools via MCP
-- **yt-dlp** -- downloads YouTube transcripts (free)
-- **ffmpeg** -- handles audio/video files
+### 2. Create a Supabase project
 
-### Step 2: Install Claude Code
+1. Go to [app.supabase.com](https://app.supabase.com)
+2. Click **New Project**
+3. Give it a name (e.g., "blog-cms") and set a database password
+4. Wait for it to finish setting up (~1 minute)
+
+### 3. Run the database migrations
+
+1. In your Supabase dashboard, go to **SQL Editor**
+2. Click **New query**
+3. Copy the contents of `supabase/migrations/001_blog_posts.sql` and paste it in
+4. Click **Run** (you should see "Success. No rows returned")
+5. Repeat with `supabase/migrations/002_blog_topics.sql`
+
+### 4. Create your CMS user
+
+1. In your Supabase dashboard, go to **Authentication** > **Users**
+2. Click **Add user** > **Create new user**
+3. Enter your email and a password
+4. Check "Auto Confirm User"
+5. Click **Create user**
+
+### 5. Set up environment variables
 
 ```bash
-npm install -g @anthropic-ai/claude-code
+cp .env.example .env
 ```
 
-Then run `claude` to log in.
+Edit `.env` with your Supabase credentials:
 
-### Step 3: Clone This Repo
+1. Go to **Settings** > **API** in your Supabase dashboard
+2. Copy your **Project URL** and **anon/public key**
+3. Paste them into `.env`:
+
+```
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
+```
+
+### 6. Start the dev server
 
 ```bash
-cd ~/
-git clone <this-repo-url> knowledge-base-kit
-cd knowledge-base-kit
+npm run dev
 ```
 
-### Step 4: Run Setup
+Open [http://localhost:5173](http://localhost:5173) and sign in with the user you created in step 4.
+
+### 7. Deploy to Vercel
 
 ```bash
-bash scripts/setup.sh
+npm run build
 ```
 
-This installs Python packages, builds the MCP server, and downloads the AI embedding model. Takes 2-5 minutes.
+Deploy the `dist/` folder to Vercel (or any static host):
 
-### Step 5: Configure Your Profile
+1. Push your repo to GitHub
+2. Go to [vercel.com/new](https://vercel.com/new) and import the repo
+3. Add your environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)
+4. Deploy
 
-Edit `config/profile.yaml` with your info:
+**Optional: Custom subdomain**
 
-```yaml
-profile:
-  name: "Your Name"
-  business: "Your Business Name"
-  website: "https://www.yourbusiness.com"
-  youtube_handle: "@YourChannel"
-  industry: "real estate"  # your industry
+Point `cms.yourdomain.com` to your Vercel deployment:
+
+1. In Vercel, go to your project **Settings** > **Domains**
+2. Add `cms.yourdomain.com`
+3. Add the CNAME record to your DNS provider
+
+### 8. Set up deploy hooks (optional)
+
+To automatically rebuild your website when you publish a post:
+
+1. Create a deploy hook in Vercel: Dashboard > Your Site Project > Settings > Git > Deploy Hooks
+2. Add it to your `.env` (and Vercel environment variables):
+   ```
+   VITE_DEPLOY_HOOK_URL=https://api.vercel.com/v1/integrations/deploy/...
+   ```
+3. Now when you save a post with status "Published", it triggers a rebuild of your main site
+
+## Claude Code Setup
+
+### How the CLAUDE.md works
+
+The `CLAUDE.md` file in the project root teaches Claude Code:
+
+- **Your database schema** -- table names, column types, and relationships
+- **The topic pipeline** -- how to save researched topics, write approved ones, and check for CMS changes
+- **The research_data JSONB format** -- a consistent structure for SEO research payloads
+- **Content block types** -- the JSON format the CMS expects for blog post content
+
+When you open Claude Code in this project directory, it reads `CLAUDE.md` automatically. You can then use natural language commands like:
+
+### Example workflows
+
+**Research topics:**
+```
+Research 5 blog topics about [YOUR NICHE]. Include keyword data,
+competitor analysis, and content gaps. Then put them in the CMS.
 ```
 
-Edit `config/channels.yaml` with your YouTube channels:
+Claude Code will research the topics and INSERT them into `blog_topics` with full keyword metrics and research data. You review them in the CMS Topics page.
 
-```yaml
-channels:
-  - handle: "@YourChannel"
-    name: "Your Channel"
-    category: "own"
-
-  # Add competitors or strategy channels:
-  # - handle: "@CompetitorChannel"
-  #   name: "Competitor Name"
-  #   category: "competitor"
+**Write approved blogs:**
+```
+Write the approved topics from the CMS.
 ```
 
-### Step 6: Ingest Your YouTube Channel
+Claude Code queries `blog_topics` for approved items, writes each one as a structured blog post using the content block format, and inserts them into `blog_posts` as drafts.
 
-```bash
-bash scripts/ingest-channel.sh @YourChannelHandle
+**Check for CMS changes:**
+```
+I made changes in the CMS -- what's new?
 ```
 
-This downloads your transcripts and makes them searchable. Takes a few minutes depending on how many videos you have.
+Claude Code queries recent updates and reports what you changed (approved topics, edited posts, etc.).
 
-### Step 7: Connect the MCP Server
-
-Add the following to your `~/.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "knowledge-base": {
-      "command": "node",
-      "args": ["/path/to/knowledge-base-kit/mcp_server/dist/index.js"]
-    }
-  }
-}
+**SEO review before publishing:**
+```
+Review the blog post "your-post-slug" for SEO quality before I publish it.
 ```
 
-Replace `/path/to/` with the actual path where you cloned the repo.
-
-### Step 8: Try It
-
-```bash
-claude
-```
-
-Then ask:
-```
-> Search my knowledge base for what I've said about [topic from your videos]
-> What do my competitors cover about [topic]?
-> Help me outline content about [topic] based on my existing videos
-```
-
----
-
-## Building Your Knowledge Base
-
-### YouTube Channels
-
-```bash
-# Ingest a single channel
-bash scripts/ingest-channel.sh @YourChannel
-
-# Ingest with custom settings
-bash scripts/ingest-channel.sh @YourChannel --days 90 --max 100
-
-# Build everything from config/channels.yaml
-bash scripts/build-knowledge-base.sh
-```
-
-### Documents (PDFs, Word, Markdown, Text)
-
-Drop files into `knowledge_bases/documents/`, then:
-
-```bash
-python3 tools/rag_tools/create_knowledge_base.py knowledge_bases/documents/ \
-    --db-dir knowledge_bases/vectors/my_documents
-```
-
-### Books (Pre-loaded)
-
-The kit ships with 12 marketing and strategy books already in `knowledge_bases/books/`:
-
-| Book / Framework | Author |
-|---|---|
-| $100M Offers | Alex Hormozi |
-| $100M Leads | Alex Hormozi |
-| Pricing Playbook | Alex Hormozi |
-| Ad Framework | Alex Hormozi |
-| New vs Old Framework | Alex Hormozi |
-| "Why You Will Never" Framework | Alex Hormozi |
-| DotCom Secrets | Russell Brunson |
-| Traffic Secrets | Russell Brunson |
-| Lead Magnet & Squeeze Page Strategy | Russell Brunson |
-| Backyard Blueprint | Russell Brunson |
-
-To index them:
-
-```bash
-python3 tools/rag_tools/create_knowledge_base.py knowledge_bases/books/ \
-    --db-dir knowledge_bases/vectors/marketing_books
-```
-
-### Channel Junkies (Pre-built)
-
-A pre-vectorized YouTube strategy database is included at `knowledge_bases/vectors/youtube_channel_junkies/`. It's ready to query immediately -- no ingestion needed.
-
----
-
-## Querying Your Knowledge Base
-
-### From the Command Line
-
-```bash
-# Search a single database
-python3 tools/rag_tools/rag_query.py "best content strategy" \
-    --db-path knowledge_bases/vectors/youtube_yourchannel
-
-# Search multiple databases
-python3 tools/rag_tools/rag_query_multi.py "lead generation tips" --all
-
-# List all registered databases
-python3 tools/rag_tools/rag_system_manager.py list
-
-# Analyze your channel content
-python3 tools/youtube_tools/analyze_channels.py topics --database youtube_yourchannel
-python3 tools/youtube_tools/analyze_channels.py top --database youtube_yourchannel
-python3 tools/youtube_tools/analyze_channels.py gaps --database youtube_yourchannel --compare-db youtube_competitor
-```
-
-### From Claude Code
-
-With the MCP server connected, just ask naturally:
-
-```
-> Search my knowledge base for [topic]
-> What have I covered about [topic] in my videos?
-> Compare my content coverage with [competitor] on [topic]
-> Find content gaps between my channel and competitors
-```
-
----
-
-## How It Works
-
-1. **YouTube transcripts** are downloaded via yt-dlp (auto-generated captions)
-2. Text is split into overlapping chunks (~500-1,000 characters)
-3. Each chunk gets a vector embedding using a local AI model (sentence-transformers/all-MiniLM-L6-v2) -- nothing sent to the internet
-4. Embeddings are stored in ChromaDB, a local vector database on your hard drive
-5. When you ask a question, it's embedded the same way and matched against stored chunks by semantic similarity
-6. Claude gets the relevant text, source, date, and a confidence score
-
-Each YouTube channel and document set gets its own database. You can search one or all.
-
----
-
-## Directory Structure
-
-```
-knowledge-base-kit/
-|-- config/                        # Your profile, channels, env vars
-|-- knowledge_bases/
-|   |-- books/                     # Marketing & strategy books (Hormozi, Brunson)
-|   |-- documents/                 # Drop your files here to index them
-|   |-- prompts/                   # Prompt templates for content generation
-|   |-- vectors/                   # Searchable databases (auto-created)
-|       |-- youtube_channel_junkies/  # Pre-built strategy DB
-|-- tools/
-|   |-- rag_tools/                 # Knowledge base create, query, manage
-|   |-- youtube_tools/             # Transcript fetch, ingest, analyze
-|-- mcp_server/                    # Connects Claude Code to your tools
-|-- scripts/                       # Setup and ingestion scripts
-|-- examples/                      # Sample configurations
-|-- .claude/                       # Claude Code config
-|   |-- agents/                    # Knowledge base builder agent
-|   |-- rules/                     # Coding conventions
-```
-
----
+See the prompts in `prompts/seo-review.md` for the full SEO audit checklist.
 
 ## Customization
 
-### Adding Your Own Prompts
+### Brand settings
 
-Drop markdown files into `knowledge_bases/prompts/`. These give Claude templates for how to use your knowledge base. Three examples are included:
+Edit the defaults in `src/config.js`, or use the **Settings** page in the CMS to configure at runtime:
 
-- `competitive_analysis.md` -- Research competitor coverage before creating content
-- `content_from_knowledge_base.md` -- Generate blogs, emails, or guides from your KB
-- `email_sequence.md` -- Write nurture emails grounded in your expertise
+- Site/brand name
+- Website URL
+- Default author
+- Blog path prefix
+- YouTube channel URL
 
-### Making It Your Own
+Settings are saved to localStorage so they persist across sessions without redeploying.
 
-Edit `.claude/CLAUDE.md` to add your business-specific instructions, brand voice guidelines, or content rules. Claude reads this file at the start of every session.
+### Categories
 
-### Creating Agents
+Edit the `CATEGORY_OPTIONS` array in `src/components/MetadataSidebar.jsx` to match your content topics:
 
-Add `.md` files to `.claude/agents/` to create specialized Claude Code agents. See the included `knowledge-base-builder.md` for the format.
+```js
+const CATEGORY_OPTIONS = [
+  'Neighborhoods',
+  'Market Update',
+  'Home Buying',
+  'Lifestyle',
+  // Add your own...
+];
+```
 
----
+### Content block types
+
+The CMS supports 12 block types out of the box. See `CLAUDE.md` for the full reference. To add a new block type:
+
+1. Add the render case in `src/components/ContentRenderer.jsx`
+2. Document it in `CLAUDE.md` so Claude Code knows how to use it
+
+### Knowledge base
+
+See `prompts/setup-knowledge-base.md` for instructions on setting up a folder of your content (transcripts, emails, past posts) so Claude Code can match your voice when writing.
+
+## Connecting to Your Website
+
+The CMS stores content in Supabase. Your website reads from the same database to display published posts.
+
+**Fetching published posts (example):**
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// Get all published posts
+const { data: posts } = await supabase
+  .from('blog_posts')
+  .select('*')
+  .eq('status', 'published')
+  .order('date', { ascending: false })
+
+// Get a single post by slug
+const { data: post } = await supabase
+  .from('blog_posts')
+  .select('*')
+  .eq('slug', 'your-post-slug')
+  .eq('status', 'published')
+  .single()
+```
+
+The RLS policies ensure that unauthenticated (anon) requests can only read published posts, while authenticated users (you in the CMS) can read and edit everything.
+
+## Block Types Reference
+
+| Type | Fields | Description |
+|------|--------|-------------|
+| `paragraph` | `text` | Regular paragraph |
+| `heading` | `text` | H2 heading with blue left border |
+| `subheading` | `text` | H3 subheading |
+| `list` | `items[]` | Bulleted list |
+| `callout` | `title`, `text` | Blue callout box |
+| `quote` | `text`, `attribution` | Block quote |
+| `image` | `src`, `alt`, `caption` | Image with optional caption |
+| `table` | `headers[]`, `rows[][]` | Data table |
+| `pros-cons` | `pros[]`, `cons[]` | Side-by-side pros and cons |
+| `info-box` | `content`, `variant?` | Info or warning box |
+| `stat-cards` | `cards[{number, label, sublabel?}]` | Statistics grid |
+| `process-steps` | `steps[{title, text}]` | Numbered steps |
+
+## Project Structure
+
+```
+claude-code-knowledge-base-kit/
+├── CLAUDE.md                    # AI assistant instructions (the valuable part)
+├── README.md                    # This file
+├── package.json                 # Dependencies
+├── vite.config.js               # Vite + Tailwind config
+├── .env.example                 # Environment variables template
+├── index.html                   # HTML entry point
+├── supabase/
+│   └── migrations/
+│       ├── 001_blog_posts.sql   # Blog posts table schema
+│       └── 002_blog_topics.sql  # Topic research pipeline schema
+├── prompts/
+│   ├── generate-blog-post.md    # Prompt: transcript to blog post
+│   ├── seo-review.md            # Prompt: SEO audit before publishing
+│   └── setup-knowledge-base.md  # Guide: set up your voice/style KB
+└── src/
+    ├── main.jsx                 # Entry point
+    ├── App.jsx                  # Routes
+    ├── index.css                # Tailwind imports
+    ├── config.js                # Brand configuration (edit defaults here)
+    ├── lib/
+    │   └── supabase.js          # Supabase client
+    ├── contexts/
+    │   └── AuthContext.jsx      # Auth state management
+    ├── pages/
+    │   ├── Login.jsx            # Email/password login
+    │   ├── Dashboard.jsx        # Post list + stats + filters
+    │   ├── PostEditor.jsx       # Content preview + metadata editor
+    │   ├── Topics.jsx           # Topic research pipeline list
+    │   ├── TopicDetail.jsx      # Individual topic detail + research data
+    │   └── Settings.jsx         # Brand/site configuration
+    └── components/
+        ├── Layout.jsx           # Sidebar navigation
+        ├── ProtectedRoute.jsx   # Auth guard
+        ├── PostCard.jsx         # Post preview card
+        ├── TopicCard.jsx        # Topic preview card
+        ├── ContentRenderer.jsx  # Block type renderer (12 types)
+        ├── MetadataSidebar.jsx  # Post metadata + SEO fields
+        └── StatusBadge.jsx      # Status label component
+```
 
 ## FAQ
 
-**Is my data private?**
-Yes. Everything runs locally. The only external connection is to YouTube for downloading public transcripts.
+**Can I use this without Claude Code?**
+Yes. You can write blog posts manually and paste the JSON blocks into Supabase, or use any AI tool to generate the content. The CMS is just a review/publishing interface.
 
-**Do I need API keys?**
-No. The core knowledge base features run entirely on your machine with no API keys needed.
+**Do I need to pay for Supabase?**
+No. The free tier includes 500MB of database storage, 50,000 monthly active users for auth, and unlimited API requests. That is far more than a blog CMS needs.
 
-**What if I don't have a YouTube channel?**
-The document indexing works without YouTube. Drop PDFs, Word docs, or text files into `knowledge_bases/documents/` and index them.
+**Can multiple people use it?**
+Yes. Create additional users in Supabase Auth. All authenticated users have full access to all posts.
 
-**Can I use this for any industry?**
-Yes. Edit `config/profile.yaml` with your industry, topics, and voice. The tools are industry-agnostic.
+**How do I deploy the CMS?**
+Run `npm run build` and deploy the `dist/` folder to any static host (Vercel, Netlify, Cloudflare Pages, etc.). It is a client-side app -- no server needed.
 
-**How do I update my knowledge base?**
-Run the ingest command again -- it automatically skips videos already in the database and only adds new ones.
-
----
-
-## Tech Stack
-
-| Component | Technology |
-|---|---|
-| Vector Database | ChromaDB (local, no cloud) |
-| Embeddings | sentence-transformers/all-MiniLM-L6-v2 (local) |
-| Text Splitting | LangChain RecursiveCharacterTextSplitter |
-| Transcript Download | yt-dlp |
-| MCP Server | Node.js + @modelcontextprotocol/sdk |
-| Python Tools | Python 3.10+ with chromadb, langchain |
-
----
-
-## Credits
-
-Built by [Aaron Chand](https://www.youtube.com/@livinginst-pete) using:
-- **Channel Junkies** -- YouTube lead generation methodology
-- **Russell Brunson** -- Epiphany Bridge and Daily Seinfeld email frameworks
-- **Alex Hormozi** -- Lead magnet, offer, and ad frameworks
-- **LangChain + ChromaDB** -- Local AI search infrastructure
-- **Model Context Protocol (MCP)** -- Claude Code tool integration
+**Is this only for real estate?**
+No. The CMS is industry-agnostic. The categories, content types, and research pipeline work for any niche. Just edit the categories in `MetadataSidebar.jsx` and update the CLAUDE.md with your domain-specific context.
 
 ## License
 
-MIT License. Use it, modify it, share it.
+MIT
